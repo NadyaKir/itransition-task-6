@@ -1,8 +1,8 @@
 import mongoose from "mongoose";
 
 const boardSchema = new mongoose.Schema({
-  name: String,
-  drawing: [String],
+  name: { type: String, required: true },
+  canvasData: { type: String, default: "" },
 });
 
 const Board = mongoose.model("Board", boardSchema);
