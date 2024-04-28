@@ -3,8 +3,9 @@ import axios from "axios";
 import { Link } from "react-router-dom";
 import { Button, Input, Empty, Flex, Col, Row, Typography } from "antd";
 import { fetchBoards } from "../api/fetchBoards";
+import Logo from "../assets/logo.png";
 
-const BoardList = (props) => {
+const BoardList = () => {
   const { Title } = Typography;
 
   const [boards, setBoards] = useState([]);
@@ -29,8 +30,15 @@ const BoardList = (props) => {
   }, [boards]);
 
   return (
-    <div className="h-screen w-screen flex flex-col m-5">
-      <div className="w-screen flex mt-5">
+    <div className="container mx-auto h-screen w-screen flex flex-col">
+      <div className="flex justify-between items-center">
+        <img src={Logo} alt="Logo" className="w-40 h-16" />
+        <p>
+          Hello, <span className="text-blue-500 font-semibold">UserName</span>
+        </p>
+      </div>
+
+      <div className="w-screen flex mt-5 mb-5">
         <form onSubmit={handleAddBoard}>
           <div className="flex gap-3 wrap">
             <Input
@@ -54,10 +62,10 @@ const BoardList = (props) => {
           </div>
         </form>
       </div>
-      <div className="mt-8">
+      <div>
         <Title>Board list</Title>
         {boards.length > 0 ? (
-          <div className="grid grid-cols-3 gap-4">
+          <div className="container grid grid-cols-3 gap-4">
             {boards.map((board, index) => (
               <div
                 key={board._id}

@@ -1,14 +1,16 @@
-import { useEffect, useState } from "react";
+import { useEffect, useState, useRef } from "react";
 import { io } from "socket.io-client";
 import { TwitterPicker } from "react-color";
 import { useDraw } from "../hooks/useDraw";
 import { drawLine } from "../utils/drawLine";
 import { useParams } from "react-router-dom";
+import { ClearOutlined, DownloadOutlined } from "@ant-design/icons";
 
 export default function Board() {
   const [color, setColor] = useState("#000");
   const { canvasRef, onMouseDown, clearCanvas } = useDraw(createLine);
   const { id } = useParams();
+  const containerRef = useRef(null);
 
   const socket = io("http://localhost:8000");
 
@@ -52,7 +54,7 @@ export default function Board() {
       socket.off("clear");
       socket.disconnect();
     };
-  }, [canvasRef, id]);
+  }, [canvasRef, id, containerRef]);
 
   function createLine({ prevPoint, currentPoint, ctx }) {
     socket.emit("draw-line", { prevPoint, currentPoint, color, boardId: id });
@@ -64,8 +66,9 @@ export default function Board() {
   function exportCanvasToJPEG() {
     const tempCanvas = document.createElement("canvas");
     const tempCtx = tempCanvas.getContext("2d");
-    tempCanvas.width = canvasRef.current.width;
-    tempCanvas.height = canvasRef.current.height;
+    tempCanvas.width = containerRef.current.offsetWidth;
+    tempCanvas.height = containerRef.current.offsetHeight;
+
     tempCtx.fillStyle = "#fff";
     tempCtx.fillRect(0, 0, tempCanvas.width, tempCanvas.height);
 
@@ -81,8 +84,8 @@ export default function Board() {
   }
 
   return (
-    <div className="w-screen h-screen bg-white flex justify-center items-center">
-      <div className="flex flex-col gap-10 pr-10">
+    <div className="w-screen h-screenflex flex-col justify-center items-center">
+      <div className="flex justify-start items-center gap-3 mb-2">
         <TwitterPicker
           color={color}
           onChange={(e) => {
@@ -96,23 +99,30 @@ export default function Board() {
             socket.emit("clear", { boardId: id });
           }}
         >
-          Clear
+          <ClearOutlined />
         </button>
         <button
           className="p-2 border rounded-md border-black"
           type="button"
           onClick={exportCanvasToJPEG}
         >
-          Export to JPEG
+          <DownloadOutlined />
         </button>
       </div>
-      <canvas
-        className="border border-black"
-        width={750}
-        height={750}
-        onMouseDown={onMouseDown}
-        ref={canvasRef}
-      />
+      <div
+        ref={containerRef}
+        className="h-screen w-screen flex grow overflow-auto"
+      >
+        <canvas
+          className="h-screen w-screen border border-gray-300"
+          width={containerRef.current ? containerRef.current.offsetWidth : 750}
+          height={
+            containerRef.current ? containerRef.current.offsetHeight : 750
+          }
+          onMouseDown={onMouseDown}
+          ref={canvasRef}
+        />
+      </div>
     </div>
   );
 }
