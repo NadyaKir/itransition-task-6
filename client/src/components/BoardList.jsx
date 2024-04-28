@@ -64,20 +64,12 @@ const BoardList = (props) => {
                 className="border border-gray-300 rounded-lg overflow-hidden"
               >
                 <Link to={`/boards/${board._id}`}>
-                  <div className="relative hover:scale-105 hover:shadow-md transition-transform duration-300">
-                    {board.canvasData ? (
-                      <img
-                        className="w-full h-auto"
-                        src={board.canvasData}
-                        alt={`Board Preview ${index}`}
-                      />
-                    ) : (
-                      <img
-                        className="w-full h-auto"
-                        src={emptyBoardIconBase64}
-                        alt={`Empty Board ${index}`}
-                      />
-                    )}
+                  <div className="relative hover:scale-105 transition-transform duration-300">
+                    <img
+                      className="w-full h-auto"
+                      src={board.canvasData}
+                      alt={`Board Preview ${index}`}
+                    />
                     <div className="absolute bottom-0 left-0 right-0 bg-[#FFA500] bg-opacity-50 text-white text-center py-2">
                       <span className="block">{board.name}</span>
                     </div>

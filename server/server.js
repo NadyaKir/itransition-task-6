@@ -39,7 +39,6 @@ io.on("connection", (socket) => {
 
   socket.on("canvas-state", async ({ boardId, canvasData }) => {
     try {
-      console.log("canvas-state id", boardId);
       const board = await Board.findById(boardId);
 
       if (!canvasData) return;
