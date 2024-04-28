@@ -61,6 +61,25 @@ export default function Board() {
     socket.emit("canvas-state", { boardId: id, canvasData });
   }
 
+  function exportCanvasToJPEG() {
+    const tempCanvas = document.createElement("canvas");
+    const tempCtx = tempCanvas.getContext("2d");
+    tempCanvas.width = canvasRef.current.width;
+    tempCanvas.height = canvasRef.current.height;
+    tempCtx.fillStyle = "#fff";
+    tempCtx.fillRect(0, 0, tempCanvas.width, tempCanvas.height);
+
+    tempCtx.drawImage(canvasRef.current, 0, 0);
+
+    const timestamp = new Date().toISOString().replace(/:/g, "-");
+    const filename = `canvas_${timestamp}.jpg`;
+
+    const link = document.createElement("a");
+    link.download = filename;
+    link.href = tempCanvas.toDataURL("image/jpeg");
+    link.click();
+  }
+
   return (
     <div className="w-screen h-screen bg-white flex justify-center items-center">
       <div className="flex flex-col gap-10 pr-10">
@@ -78,6 +97,13 @@ export default function Board() {
           }}
         >
           Clear
+        </button>
+        <button
+          className="p-2 border rounded-md border-black"
+          type="button"
+          onClick={exportCanvasToJPEG}
+        >
+          Export to JPEG
         </button>
       </div>
       <canvas
