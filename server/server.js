@@ -37,11 +37,12 @@ io.on("connection", (socket) => {
     }
   });
 
-  socket.on("canvas-state", async (canvasData) => {
+  socket.on("canvas-state", async ({ boardId, canvasData }) => {
     try {
-      const boardId = socket.handshake.query.boardId;
+      console.log("canvas-state id", boardId);
       const board = await Board.findById(boardId);
 
+      if (!canvasData) return;
       board.canvasData = canvasData;
 
       await board.save();
@@ -65,7 +66,6 @@ io.on("connection", (socket) => {
       await board.save();
       socket.join(boardId);
       io.to(boardId).emit("clear");
-      io.to(boardId).emit("get-canvas-state");
     } catch (error) {
       console.error("Error clearing canvas data:", error);
     }

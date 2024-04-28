@@ -67,13 +67,13 @@ const BoardList = (props) => {
         </Flex>
         <Flex vertical>
           <Title>Board list</Title>
-          <Row gutter={[24, 24]}>
-            {boards.map((board) => (
-              <Col span={6} key={board._id}>
+          {boards.map((board) => (
+            <ul span={6} key={board._id}>
+              <li>
                 <Link to={`/boards/${board._id}`}>{board.name}</Link>
-              </Col>
-            ))}
-          </Row>
+              </li>
+            </ul>
+          ))}
         </Flex>
       </Flex>
     </Flex>

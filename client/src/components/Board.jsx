@@ -10,11 +10,15 @@ export default function Board() {
   const { canvasRef, onMouseDown, clearCanvas } = useDraw(createLine);
   const { id } = useParams();
 
-  console.log("id", id);
   const socket = io("http://localhost:8000");
 
   useEffect(() => {
     const ctx = canvasRef.current.getContext("2d");
+
+    socket.on("connect", () => {
+      console.log("Connected to server");
+      socket.emit("client-ready", id);
+    });
 
     socket.emit("client-ready", id);
 
@@ -54,7 +58,7 @@ export default function Board() {
     socket.emit("draw-line", { prevPoint, currentPoint, color, boardId: id });
     drawLine({ prevPoint, currentPoint, ctx, color });
     const canvasData = canvasRef.current.toDataURL();
-    socket.emit("canvas-state", canvasData);
+    socket.emit("canvas-state", { boardId: id, canvasData });
   }
 
   return (
