@@ -6,7 +6,7 @@ import Home from "./pages/HomePage";
 
 function App() {
   return (
-    <div className="h-screen">
+    <div className="h-screen w-screen flex flex-col">
       <Outlet />
     </div>
   );
