@@ -1,15 +1,18 @@
 import React, { useState, useEffect } from "react";
 import axios from "axios";
 import { Link } from "react-router-dom";
-import { Button, Input, Empty, Flex, Col, Row, Typography } from "antd";
+import { Button, Input, Empty, Spin, Typography } from "antd";
 import { fetchBoards } from "../api/fetchBoards";
 import Logo from "../assets/logo.png";
+import Loader from "./Loader";
+import EmptyData from "./EmptyData";
 
 const BoardList = () => {
   const { Title } = Typography;
 
   const [boards, setBoards] = useState([]);
-  console.log(boards);
+  const [isLoading, setIsLoading] = useState(false);
+  console.log(isLoading);
   const [newBoardName, setNewBoardName] = useState("");
 
   const handleAddBoard = (event) => {
@@ -26,11 +29,11 @@ const BoardList = () => {
   };
 
   useEffect(() => {
-    fetchBoards(setBoards);
-  }, [boards]);
+    fetchBoards(setBoards, setIsLoading);
+  }, [setBoards, setIsLoading]);
 
   return (
-    <div className="container mx-auto h-screen w-screen flex flex-col">
+    <div className="container mx-auto min-h-screen w-screen flex flex-col">
       <div className="flex justify-between items-center">
         <img src={Logo} alt="Logo" className="w-40 h-16" />
         <p>
@@ -62,10 +65,16 @@ const BoardList = () => {
           </div>
         </form>
       </div>
-      <div>
+
+      <div className="flex flex-col h-full flex-1">
         <Title>Board list</Title>
-        {boards.length > 0 ? (
-          <div className="container grid grid-cols-3 gap-4">
+
+        {isLoading && <Loader />}
+
+        {!isLoading && boards.length === 0 && <EmptyData />}
+
+        {boards.length > 0 && (
+          <div className="grid grid-cols-3 gap-4">
             {boards.map((board, index) => (
               <div
                 key={board._id}
@@ -85,10 +94,6 @@ const BoardList = () => {
                 </Link>
               </div>
             ))}
-          </div>
-        ) : (
-          <div className="h-screen w-screen flex justify-center items-center">
-            <Empty />
           </div>
         )}
       </div>
