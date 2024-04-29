@@ -10,7 +10,6 @@ export default function Board() {
   const [color, setColor] = useState("#000");
   const { canvasRef, onMouseDown, clearCanvas } = useDraw(createLine);
   const { id } = useParams();
-  const containerRef = useRef(null);
 
   const socket = io("http://localhost:8000");
 
@@ -54,7 +53,7 @@ export default function Board() {
       socket.off("clear");
       socket.disconnect();
     };
-  }, [canvasRef, id, containerRef]);
+  }, [canvasRef, id]);
 
   function createLine({ prevPoint, currentPoint, ctx }) {
     socket.emit("draw-line", { prevPoint, currentPoint, color, boardId: id });
@@ -66,8 +65,8 @@ export default function Board() {
   function exportCanvasToJPEG() {
     const tempCanvas = document.createElement("canvas");
     const tempCtx = tempCanvas.getContext("2d");
-    tempCanvas.width = containerRef.current.offsetWidth;
-    tempCanvas.height = containerRef.current.offsetHeight;
+    tempCanvas.width = canvasRef.current.offsetWidth;
+    tempCanvas.height = canvasRef.current.offsetHeight;
 
     tempCtx.fillStyle = "#fff";
     tempCtx.fillRect(0, 0, tempCanvas.width, tempCanvas.height);
@@ -84,8 +83,8 @@ export default function Board() {
   }
 
   return (
-    <div className="w-screen h-screenflex flex-col justify-center items-center">
-      <div className="flex justify-start items-center gap-3 mb-2">
+    <div className="relative w-screen h-screen flex flex-col justify-center items-center">
+      <div className="absolute top-0 left-0 flex justify-start items-center gap-3 mb-2 p-4">
         <TwitterPicker
           color={color}
           onChange={(e) => {
@@ -109,20 +108,13 @@ export default function Board() {
           <DownloadOutlined />
         </button>
       </div>
-      <div
-        ref={containerRef}
-        className="h-screen w-screen flex grow overflow-auto"
-      >
-        <canvas
-          className="h-screen w-screen border border-gray-300"
-          width={containerRef.current ? containerRef.current.offsetWidth : 750}
-          height={
-            containerRef.current ? containerRef.current.offsetHeight : 750
-          }
-          onMouseDown={onMouseDown}
-          ref={canvasRef}
-        />
-      </div>
+      <canvas
+        className="h-screen w-screen border border-gray-300"
+        width={canvasRef.current ? canvasRef.current.offsetWidth : 750}
+        height={canvasRef.current ? canvasRef.current.offsetHeight : 750}
+        onMouseDown={onMouseDown}
+        ref={canvasRef}
+      />
     </div>
   );
 }
