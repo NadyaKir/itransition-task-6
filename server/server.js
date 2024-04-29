@@ -53,6 +53,12 @@ io.on("connection", (socket) => {
     }
   });
 
+  socket.on("rectangleAdded", ({ boardId, rectangleData }) => {
+    console.log("Прямоугольник добавлен на доску с id:", boardId);
+    console.log("Данные прямоугольника:", rectangleData);
+    socket.to(boardId).emit("rectangleAddedToCanvas", rectangleData);
+  });
+
   socket.on("draw-line", ({ prevPoint, currentPoint, color, boardId }) => {
     socket.join(boardId);
     io.to(boardId).emit("draw-line", { prevPoint, currentPoint, color });

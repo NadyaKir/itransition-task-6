@@ -12,7 +12,6 @@ const BoardList = () => {
 
   const [boards, setBoards] = useState([]);
   const [isLoading, setIsLoading] = useState(false);
-  console.log(isLoading);
   const [newBoardName, setNewBoardName] = useState("");
 
   const handleAddBoard = (event) => {
@@ -33,7 +32,7 @@ const BoardList = () => {
   }, [setBoards, setIsLoading]);
 
   return (
-    <div className="container mx-auto min-h-screen w-screen flex flex-col">
+    <div className="container mx-auto min-h-screen flex flex-col">
       <div className="flex justify-between items-center">
         <img src={Logo} alt="Logo" className="w-40 h-16" />
         <p>
@@ -74,7 +73,7 @@ const BoardList = () => {
         {!isLoading && boards.length === 0 && <EmptyData />}
 
         {boards.length > 0 && (
-          <div className="grid grid-cols-3 gap-4">
+          <div className="grid grid-cols-3 gap-4 mb-5">
             {boards.map((board, index) => (
               <div
                 key={board._id}
