@@ -15,6 +15,38 @@ export default function Board() {
   const { id } = useParams();
   const socket = io("http://localhost:8000");
 
+  const updateEventList = [
+    "object:modified",
+    "object:added",
+    "object:removed",
+    "object:moved",
+  ];
+
+  const update = () => {
+    console.log("canvas updated");
+    const data = editor.canvas.toJSON();
+    const preview = editor.canvas.toDataURL();
+    socket.emit("canvas-state", {
+      boardId: id,
+      canvasData: data,
+      previewData: preview,
+    });
+  };
+
+  const addUpdateEvents = () => {
+    updateEventList.forEach((event) => {
+      editor.canvas.on(event, () => {
+        update();
+      });
+    });
+  };
+
+  const removeUpdateEvents = () => {
+    updateEventList.forEach((event) => {
+      editor.canvas.off(event);
+    });
+  };
+
   useEffect(() => {
     if (!editor || !fabric) {
       return;
@@ -28,22 +60,22 @@ export default function Board() {
   };
 
   const onAddRectangle = () => {
-    const rectangleData = new fabric.Rect({
+    const rectangle = new fabric.Rect({
       width: 200,
       height: 100,
       fill: "",
       stroke: color,
       strokeWidth: 3,
     });
-    console.log(rectangleData);
-    editor.canvas.add(rectangleData);
+    console.log(rectangle);
+    editor.canvas.add(rectangle);
     socket.emit("rectangleAdded", {
       boardId: id,
-      rectangleData: rectangleData.toObject(),
+      rectangleData: rectangle.toObject(),
     });
   };
 
-  const toggleDraw = () => {
+  const toggleDrawingMode = () => {
     editor.canvas.isDrawingMode = !editor.canvas.isDrawingMode;
   };
 
@@ -55,6 +87,7 @@ export default function Board() {
     }
     editor.canvas.renderAll();
   };
+
   const redo = () => {
     if (history.length > 0) {
       editor.canvas.add(history.pop());
@@ -66,39 +99,23 @@ export default function Board() {
       return;
     }
 
+    removeUpdateEvents();
+    addUpdateEvents();
+
     socket.on("connect", () => {
       console.log("Connected to server");
       socket.emit("client-ready", id);
     });
 
-    socket.on("get-canvas-state", () => {
-      if (!editor.canvas) return;
-      console.log("sending canvas state");
-      const canvasData = editor.canvas.toDataURL();
-      socket.emit("canvas-state", {
-        boardId: id,
-        canvasData,
-      });
-    });
-
-    socket.on("rectangleAddedToCanvas", (rectangleData) => {
-      const { width, height, fill, stroke, strokeWidth } = rectangleData;
-      const rect = new fabric.Rect({
-        width,
-        height,
-        fill,
-        stroke,
-        strokeWidth,
-      });
-      editor.canvas.add(rect);
-    });
-
     socket.on("canvas-state-from-server", (state) => {
       console.log("I received the state");
       console.log("state from db", state);
-      fabric.Image.fromURL(state, (img) => {
-        editor.canvas.add(img);
-      });
+      removeUpdateEvents();
+      editor.canvas.loadFromJSON(
+        state,
+        editor.canvas.renderAll.bind(editor.canvas)
+      );
+      addUpdateEvents();
     });
 
     socket.on("clear", () => {
@@ -108,7 +125,7 @@ export default function Board() {
     });
 
     return () => {
-      socket.off("get-canvas-state");
+      removeUpdateEvents();
       socket.off("canvas-state-from-server");
       socket.off("clear");
       socket.disconnect();
@@ -159,7 +176,7 @@ export default function Board() {
         </button>
         <button
           className="px-2 py-1 border rounded-md border-black"
-          onClick={toggleDraw}
+          onClick={toggleDrawingMode}
         >
           <BsBrush />
         </button>
