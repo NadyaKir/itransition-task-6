@@ -2,10 +2,17 @@ import React, { useState } from "react";
 import Logo from "../assets/logo.png";
 import { Button, Input, Flex } from "antd";
 import { useNavigate } from "react-router-dom";
+import { setUserName } from "../store/userSlice";
+import { useDispatch, useSelector } from "react-redux";
 
 export default function Home() {
-  const [userName, setUserName] = useState("");
+  // const [userName, setUserName] = useState("");
+
   const navigate = useNavigate();
+  const dispatch = useDispatch();
+
+  const userName = useSelector((state) => state.users.userName);
+  console.log(userName);
 
   const handleEnter = () => {
     if (userName.trim() !== "") {
@@ -22,7 +29,7 @@ export default function Home() {
             type="text"
             placeholder="Enter your name"
             value={userName}
-            onChange={(e) => setUserName(e.target.value)}
+            onChange={(e) => dispatch(setUserName(e.target.value))}
             style={{
               borderColor: "#FFA500",
             }}

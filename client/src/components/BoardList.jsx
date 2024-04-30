@@ -7,12 +7,14 @@ import Logo from "../assets/logo.png";
 import EmptyCanvas from "../assets/empty_canvas.jpeg";
 import Loader from "./Loader";
 import EmptyData from "./EmptyData";
+import { useSelector } from "react-redux";
 
 const BoardList = () => {
   const [boards, setBoards] = useState([]);
   const [isLoading, setIsLoading] = useState(false);
   const [newBoardName, setNewBoardName] = useState("");
   const [searchQuery, setSearchQuery] = useState("");
+  const user = useSelector((state) => state.users.userName);
 
   const handleAddBoard = (event) => {
     event.preventDefault();
@@ -42,7 +44,7 @@ const BoardList = () => {
           <img src={Logo} alt="Logo" className="w-40 h-16" />
         </Link>
         <p>
-          Hello, <span className="text-blue-800 font-semibold">UserName</span>
+          Hello, <span className="text-blue-800 font-semibold">{user}</span>
         </p>
       </div>
 
