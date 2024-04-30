@@ -11,6 +11,8 @@ import { BiUndo, BiRedo } from "react-icons/bi";
 import { RiDeleteBinLine } from "react-icons/ri";
 import ToolButton from "./ToolButton";
 import { InputNumber } from "antd";
+import { createGeometryShape } from "../utils/createGeometryShape";
+
 export default function Board() {
   const { editor, onReady } = useFabricJSEditor();
   const [color, setColor] = useState("#000");
@@ -61,27 +63,23 @@ export default function Board() {
   }, [color, brushSize]);
 
   const onAddCircle = () => {
-    editor.addCircle();
+    const { shape: circle } = createGeometryShape({
+      canvas: editor.canvas,
+      shapeType: "circle",
+      color,
+    });
+
+    editor.canvas.add(circle);
   };
 
   const onAddRectangle = () => {
-    const randomX = Math.random() * (editor.canvas.width - 200);
-    const randomY = Math.random() * (editor.canvas.height - 100);
-    const rectangle = new fabric.Rect({
-      width: 200,
-      height: 100,
-      fill: "",
-      stroke: color,
-      strokeWidth: 3,
-      left: randomX,
-      top: randomY,
+    const { shape: rectangle } = createGeometryShape({
+      canvas: editor.canvas,
+      shapeType: "rect",
+      color,
     });
 
     editor.canvas.add(rectangle);
-    socket.emit("rectangleAdded", {
-      boardId: id,
-      rectangleData: rectangle.toObject(),
-    });
   };
 
   const toggleDrawingMode = () => {
