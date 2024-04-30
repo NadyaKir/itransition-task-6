@@ -14,6 +14,7 @@ const BoardList = () => {
   const [boards, setBoards] = useState([]);
   const [isLoading, setIsLoading] = useState(false);
   const [newBoardName, setNewBoardName] = useState("");
+  const [searchQuery, setSearchQuery] = useState("");
 
   const handleAddBoard = (event) => {
     event.preventDefault();
@@ -31,6 +32,10 @@ const BoardList = () => {
   useEffect(() => {
     fetchBoards(setBoards, setIsLoading);
   }, [setBoards, setIsLoading]);
+
+  const filteredBoards = boards.filter((board) =>
+    board.name.toLowerCase().includes(searchQuery.toLowerCase())
+  );
 
   return (
     <div className="container mx-auto min-h-screen flex flex-col">
@@ -67,15 +72,25 @@ const BoardList = () => {
       </div>
 
       <div className="flex flex-col h-full flex-1">
-        <Title>Board list</Title>
+        <div>
+          <Title>Board list</Title>
+          <div className="flex mt-5 mb-5 items-center">
+            <Input
+              type="text"
+              value={searchQuery}
+              onChange={(event) => setSearchQuery(event.target.value)}
+              placeholder="Search boards"
+            />
+          </div>
+        </div>
 
         {isLoading && <Loader />}
 
         {!isLoading && boards.length === 0 && <EmptyData />}
 
-        {boards.length > 0 && (
+        {filteredBoards.length > 0 && (
           <div class="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 xl:grid-cols-5 gap-4 mb-5">
-            {boards.map((board, index) => (
+            {filteredBoards.map((board, index) => (
               <div
                 key={board._id}
                 className="border border-gray-300 rounded-lg overflow-hidden"
@@ -96,6 +111,7 @@ const BoardList = () => {
             ))}
           </div>
         )}
+        {filteredBoards.length === 0 && <EmptyData />}
       </div>
     </div>
   );
