@@ -1,4 +1,4 @@
-import { useEffect, useState, useRef } from "react";
+import { useEffect, useState } from "react";
 import { io } from "socket.io-client";
 import { Link, useParams } from "react-router-dom";
 import { ClearOutlined, DownloadOutlined } from "@ant-design/icons";
@@ -12,6 +12,7 @@ import { RiDeleteBinLine } from "react-icons/ri";
 import ToolButton from "./ToolButton";
 import { InputNumber } from "antd";
 import { createGeometryShape } from "../utils/createGeometryShape";
+import { useSelector } from "react-redux";
 
 export default function Board() {
   const { editor, onReady } = useFabricJSEditor();
@@ -21,6 +22,8 @@ export default function Board() {
   const { id } = useParams();
   const socket = io("http://localhost:8000");
 
+  const userName = useSelector((state) => state.users.userName);
+  console.log("useSelector", userName);
   const updateEventList = [
     "object:modified",
     "object:added",
@@ -120,6 +123,16 @@ export default function Board() {
     socket.on("connect", () => {
       console.log("Connected to server");
       socket.emit("client-ready", id);
+    });
+
+    socket.emit("joinRoom", id, userName);
+
+    socket.on("userJoined", ({ userName }) => {
+      console.log(`${userName} присоединился к комнате`);
+    });
+
+    socket.on("participantsCount", (count) => {
+      console.log(`Количество участников в комнате: ${count}`);
     });
 
     socket.on("canvas-state-from-server", (state) => {

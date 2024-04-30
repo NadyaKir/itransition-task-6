@@ -19,6 +19,16 @@ const io = new Server(server, {
 io.on("connection", (socket) => {
   console.log("connection");
 
+  socket.on("joinRoom", (boardId, userName) => {
+    boardId = boardId;
+    console.log("hello", userName);
+    socket.join(boardId);
+    io.to(boardId).emit("userJoined", { userId: socket.id, userName });
+    const room = io.sockets.adapter.rooms.get(boardId);
+    const participantsCount = room ? room.size : 0;
+    io.to(boardId).emit("participantsCount", participantsCount);
+  });
+
   socket.on("client-ready", async (boardId) => {
     try {
       socket.join(boardId);
