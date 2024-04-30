@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from "react";
 import axios from "axios";
 import { Link } from "react-router-dom";
-import { Button, Input, Typography } from "antd";
+import { Button, Input, Space } from "antd";
 import { fetchBoards } from "../api/fetchBoards";
 import Logo from "../assets/logo.png";
 import EmptyCanvas from "../assets/empty_canvas.jpeg";
@@ -9,8 +9,6 @@ import Loader from "./Loader";
 import EmptyData from "./EmptyData";
 
 const BoardList = () => {
-  const { Title } = Typography;
-
   const [boards, setBoards] = useState([]);
   const [isLoading, setIsLoading] = useState(false);
   const [newBoardName, setNewBoardName] = useState("");
@@ -46,7 +44,7 @@ const BoardList = () => {
         </p>
       </div>
 
-      <div className="w-screen flex mt-5 mb-5">
+      <div className="flex mt-5 mb-5">
         <form onSubmit={handleAddBoard}>
           <div className="flex gap-3 wrap">
             <Input
@@ -72,37 +70,39 @@ const BoardList = () => {
       </div>
 
       <div className="flex flex-col h-full flex-1">
-        <div>
-          <Title>Board list</Title>
+        <div className="flex justify-between items-center flex-wrap">
+          <h1 class="font-semibold text-2xl">Board list</h1>
           <div className="flex mt-5 mb-5 items-center">
-            <Input
-              type="text"
-              value={searchQuery}
-              onChange={(event) => setSearchQuery(event.target.value)}
-              placeholder="Search boards"
-            />
+            <Space.Compact>
+              <Input
+                type="text"
+                value={searchQuery}
+                onChange={(event) => setSearchQuery(event.target.value)}
+                placeholder="Search boards"
+              />
+            </Space.Compact>
           </div>
         </div>
 
         {isLoading && <Loader />}
 
-        {!isLoading && boards.length === 0 && <EmptyData />}
+        {/* {!isLoading && boards.length === 0 && <EmptyData />} */}
 
         {filteredBoards.length > 0 && (
           <div class="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 xl:grid-cols-5 gap-4 mb-5">
             {filteredBoards.map((board, index) => (
               <div
                 key={board._id}
-                className="border border-gray-300 rounded-lg overflow-hidden"
+                className="h-40 border border-gray-100 shadow-sm rounded-lg overflow-hidden"
               >
                 <Link to={`/boards/${board._id}`}>
-                  <div className="relative h-full hover:scale-105 transition-transform duration-300">
+                  <div className="relative h-full hover:scale-105 hover:shadow-md transition-transform duration-300">
                     <img
-                      className="w-full h-auto"
+                      className="w-full"
                       src={board.previewData ? board.previewData : EmptyCanvas}
                       alt={`Board Preview ${index}`}
                     />
-                    <div className="absolute bottom-0 left-0 right-0 bg-[#FFA500] bg-opacity-50 text-white text-center py-2">
+                    <div className="absolute bottom-0 left-0 right-0 bg-[#FFA500] bg-opacity-60 text-white text-center py-2">
                       <span className="block">{board.name}</span>
                     </div>
                   </div>
@@ -111,7 +111,7 @@ const BoardList = () => {
             ))}
           </div>
         )}
-        {filteredBoards.length === 0 && <EmptyData />}
+        {!isLoading && filteredBoards.length === 0 && <EmptyData />}
       </div>
     </div>
   );
