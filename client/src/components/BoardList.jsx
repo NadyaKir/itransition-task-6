@@ -29,49 +29,50 @@ const BoardList = () => {
 
   useEffect(() => {
     fetchBoards(setBoards, setIsLoading);
-  }, [setBoards, setIsLoading]);
+  }, [setBoards, setIsLoading, setSearchQuery]);
 
   const filteredBoards = boards.filter((board) =>
     board.name.toLowerCase().includes(searchQuery.toLowerCase())
   );
 
   return (
-    <div className="container mx-auto min-h-screen flex flex-col">
-      <div className="flex justify-between items-center">
-        <img src={Logo} alt="Logo" className="w-40 h-16" />
+    <div className="container mx-auto min-h-screen flex flex-col flex-wrap px-1">
+      <div className="flex justify-between items-center mt-2">
+        <Link to={`/`}>
+          <img src={Logo} alt="Logo" className="w-40 h-16" />
+        </Link>
         <p>
-          Hello, <span className="text-blue-500 font-semibold">UserName</span>
+          Hello, <span className="text-blue-800 font-semibold">UserName</span>
         </p>
-      </div>
-
-      <div className="flex mt-5 mb-5">
-        <form onSubmit={handleAddBoard}>
-          <div className="flex gap-3 wrap">
-            <Input
-              type="text"
-              value={newBoardName}
-              onChange={(event) => setNewBoardName(event.target.value)}
-              placeholder="Enter board name"
-            />
-            <Button
-              ghost
-              htmlType="submit"
-              style={{
-                backgroundColor: "#FFA500",
-                borderColor: "#FFA500",
-                color: "white",
-                transition: "background-color 0.3s",
-              }}
-            >
-              Add board
-            </Button>
-          </div>
-        </form>
       </div>
 
       <div className="flex flex-col h-full flex-1">
         <div className="flex justify-between items-center flex-wrap">
-          <h1 class="font-semibold text-2xl">Board list</h1>
+          <div className="flex mt-5 mb-5">
+            <form onSubmit={handleAddBoard}>
+              <div className="flex gap-3 wrap">
+                <Input
+                  type="text"
+                  value={newBoardName}
+                  onChange={(event) => setNewBoardName(event.target.value)}
+                  placeholder="Enter board name"
+                />
+                <Button
+                  ghost
+                  htmlType="submit"
+                  style={{
+                    backgroundColor: "#FFA500",
+                    borderColor: "#FFA500",
+                    color: "white",
+                    transition: "background-color 0.3s",
+                  }}
+                >
+                  Add board
+                </Button>
+              </div>
+            </form>
+          </div>
+
           <div className="flex mt-5 mb-5 items-center">
             <Space.Compact>
               <Input
@@ -86,7 +87,7 @@ const BoardList = () => {
 
         {isLoading && <Loader />}
 
-        {/* {!isLoading && boards.length === 0 && <EmptyData />} */}
+        {!isLoading && boards.length === 0 && <EmptyData />}
 
         {filteredBoards.length > 0 && (
           <div class="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 xl:grid-cols-5 gap-4 mb-5">
@@ -103,7 +104,7 @@ const BoardList = () => {
                       alt={`Board Preview ${index}`}
                     />
                     <div className="absolute bottom-0 left-0 right-0 bg-[#FFA500] bg-opacity-60 text-white text-center py-2">
-                      <span className="block">{board.name}</span>
+                      <span className="block font-bold">{board.name}</span>
                     </div>
                   </div>
                 </Link>
