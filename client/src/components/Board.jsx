@@ -1,6 +1,6 @@
 import { useEffect, useState, useRef } from "react";
 import { io } from "socket.io-client";
-import { useParams } from "react-router-dom";
+import { Link, useParams } from "react-router-dom";
 import { ClearOutlined, DownloadOutlined } from "@ant-design/icons";
 import { fabric } from "fabric";
 import { FabricJSCanvas, useFabricJSEditor } from "fabricjs-react";
@@ -8,10 +8,14 @@ import { BsBrush } from "react-icons/bs";
 import { FaRegCircle } from "react-icons/fa";
 import { BiRectangle } from "react-icons/bi";
 import { BiUndo, BiRedo } from "react-icons/bi";
-
+import { RiDeleteBinLine } from "react-icons/ri";
+import ToolButton from "./ToolButton";
+import { InputNumber } from "antd";
 export default function Board() {
   const { editor, onReady } = useFabricJSEditor();
   const [color, setColor] = useState("#000");
+  const [isDrawing, setIsDrawing] = useState(false);
+  const [brushSize, setBrushSize] = useState();
   const { id } = useParams();
   const socket = io("http://localhost:8000");
 
@@ -52,8 +56,9 @@ export default function Board() {
       return;
     }
     editor.canvas.freeDrawingBrush.color = color;
+    editor.canvas.freeDrawingBrush.width = brushSize;
     editor.setStrokeColor(color);
-  }, [color]);
+  }, [color, brushSize]);
 
   const onAddCircle = () => {
     editor.addCircle();
@@ -81,6 +86,7 @@ export default function Board() {
 
   const toggleDrawingMode = () => {
     editor.canvas.isDrawingMode = !editor.canvas.isDrawingMode;
+    setIsDrawing(!isDrawing);
   };
 
   const history = [];
@@ -96,6 +102,14 @@ export default function Board() {
     if (history.length > 0) {
       editor.canvas.add(history.pop());
     }
+  };
+
+  const clear = () => {
+    socket.emit("clear", { boardId: id });
+  };
+
+  const removeSelectedObject = () => {
+    editor.canvas.remove(editor.canvas.getActiveObject());
   };
 
   useEffect(() => {
@@ -151,67 +165,95 @@ export default function Board() {
     link.click();
   }
 
+  const onSizeChange = (value) => {
+    setBrushSize(value);
+  };
+
   return (
-    <div className="relative w-screen h-screen flex flex-col justify-center items-center">
-      <div className=" flex justify-start items-center gap-3 mb-2 p-4">
-        <label>
-          <input
-            type="color"
-            value={color}
-            onChange={(e) => setColor(e.target.value)}
+    <div className="relative w-screen h-screen flex justify-center items-center">
+      <div className="absolute top-0 left-0 flex flex-col justify-start items-center gap-3 mb-2 p-4 z-10">
+        <button className="mb-5 text-2xl">
+          <Link to="/boards">Back</Link>
+        </button>
+        <ToolButton title="Select color">
+          <label className="inline-block">
+            <input
+              type="color"
+              value={color}
+              onChange={(e) => setColor(e.target.value)}
+              className=" h-11"
+            />
+          </label>
+        </ToolButton>
+
+        <ToolButton handleEvent={clear}>
+          <ClearOutlined
+            className="text-black hover:text-orange-500 text-3xl"
+            title="Clear all"
           />
-        </label>
-        <button
-          className="px-2 py-1 border rounded-md border-black"
-          type="button"
-          onClick={() => {
-            socket.emit("clear", { boardId: id });
-          }}
-        >
-          <ClearOutlined />
-        </button>
-        <button
-          className="px-2 py-1 border rounded-md border-black"
-          type="button"
-          onClick={exportCanvasToJPEG}
-        >
-          <DownloadOutlined />
-        </button>
-        <button
-          className="px-2 py-1 border rounded-md border-black"
-          onClick={toggleDrawingMode}
-        >
-          <BsBrush />
-        </button>
-        <button
-          className="px-2 py-1 border rounded-md border-black"
-          type="button"
-          onClick={onAddCircle}
-        >
-          <FaRegCircle />
-        </button>
-        <button
-          className="px-2 py-1 border rounded-md border-black"
-          type="button"
-          onClick={onAddRectangle}
-        >
-          <BiRectangle />
-        </button>
-        <button
-          className="px-2 py-1 border rounded-md border-black"
-          onClick={undo}
-        >
-          <BiUndo />
-        </button>
-        <button
-          className="px-2 py-1 border rounded-md border-black"
-          onClick={redo}
-        >
-          <BiRedo />
-        </button>
+        </ToolButton>
+
+        <ToolButton handleEvent={toggleDrawingMode}>
+          <BsBrush
+            className={`${
+              isDrawing ? "text-orange-500" : "text-black"
+            } text-3xl hover:text-orange-500`}
+            title="Brush"
+          />
+        </ToolButton>
+        {isDrawing && (
+          <InputNumber
+            size="small"
+            min={1}
+            max={10}
+            defaultValue={3}
+            onChange={onSizeChange}
+            changeOnWheel
+            className="hover:border-orange-500 w-12 border-transparent text-center focus:border-orange-500 transition-all duration-300"
+          />
+        )}
+
+        <ToolButton handleEvent={onAddCircle}>
+          <FaRegCircle
+            className="text-black hover:text-orange-500 text-3xl"
+            title="Circle"
+          />
+        </ToolButton>
+        <ToolButton handleEvent={onAddRectangle}>
+          <BiRectangle
+            className="text-black hover:text-orange-500 text-3xl"
+            title="Rectangle"
+          />
+        </ToolButton>
+        <ToolButton handleEvent={removeSelectedObject}>
+          <RiDeleteBinLine
+            className="text-black hover:text-orange-500 text-3xl"
+            title="Remove item"
+          />
+        </ToolButton>
+        <div className="flex gap-1">
+          <ToolButton handleEvent={undo}>
+            <BiUndo
+              className="text-black hover:text-orange-500 text-3xl"
+              title="Undo"
+            />
+          </ToolButton>
+          <ToolButton handleEvent={redo}>
+            <BiRedo
+              className="text-black hover:text-orange-500 text-3xl"
+              title="Redo"
+            />
+          </ToolButton>
+        </div>
+        <ToolButton handleEvent={exportCanvasToJPEG}>
+          <DownloadOutlined
+            className="text-black hover:text-orange-500 text-3xl"
+            title="Export to JPEG"
+          />
+        </ToolButton>
       </div>
       <FabricJSCanvas
-        className="sample-canvas border h-screen w-screen  border-blackz-0 "
+        className="sample-canvas border h-screen w-screen  border-black"
         onReady={onReady}
       />
     </div>
