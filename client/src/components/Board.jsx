@@ -60,14 +60,18 @@ export default function Board() {
   };
 
   const onAddRectangle = () => {
+    const randomX = Math.random() * (editor.canvas.width - 200);
+    const randomY = Math.random() * (editor.canvas.height - 100);
     const rectangle = new fabric.Rect({
       width: 200,
       height: 100,
       fill: "",
       stroke: color,
       strokeWidth: 3,
+      left: randomX,
+      top: randomY,
     });
-    console.log(rectangle);
+
     editor.canvas.add(rectangle);
     socket.emit("rectangleAdded", {
       boardId: id,
@@ -98,7 +102,6 @@ export default function Board() {
     if (!editor || !editor.canvas) {
       return;
     }
-
     removeUpdateEvents();
     addUpdateEvents();
 
@@ -208,7 +211,7 @@ export default function Board() {
         </button>
       </div>
       <FabricJSCanvas
-        className="sample-canvas border h-screen w-screen  border-black bg-gray-200 z-0 "
+        className="sample-canvas border h-screen w-screen  border-blackz-0 "
         onReady={onReady}
       />
     </div>
