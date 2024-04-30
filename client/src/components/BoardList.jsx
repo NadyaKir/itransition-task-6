@@ -1,9 +1,10 @@
 import React, { useState, useEffect } from "react";
 import axios from "axios";
 import { Link } from "react-router-dom";
-import { Button, Input, Empty, Spin, Typography } from "antd";
+import { Button, Input, Typography } from "antd";
 import { fetchBoards } from "../api/fetchBoards";
 import Logo from "../assets/logo.png";
+import EmptyCanvas from "../assets/empty_canvas.jpeg";
 import Loader from "./Loader";
 import EmptyData from "./EmptyData";
 
@@ -73,17 +74,17 @@ const BoardList = () => {
         {!isLoading && boards.length === 0 && <EmptyData />}
 
         {boards.length > 0 && (
-          <div className="grid grid-cols-3 gap-4 mb-5">
+          <div class="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 xl:grid-cols-5 gap-4 mb-5">
             {boards.map((board, index) => (
               <div
                 key={board._id}
                 className="border border-gray-300 rounded-lg overflow-hidden"
               >
                 <Link to={`/boards/${board._id}`}>
-                  <div className="relative hover:scale-105 transition-transform duration-300">
+                  <div className="relative h-full hover:scale-105 transition-transform duration-300">
                     <img
                       className="w-full h-auto"
-                      src={board.canvasData}
+                      src={board.previewData ? board.previewData : EmptyCanvas}
                       alt={`Board Preview ${index}`}
                     />
                     <div className="absolute bottom-0 left-0 right-0 bg-[#FFA500] bg-opacity-50 text-white text-center py-2">
