@@ -4,7 +4,6 @@ export const userSlice = createSlice({
   name: "users",
   initialState: {
     userName: "",
-    room: {},
   },
   reducers: {
     setUserName: (state, action) => {
