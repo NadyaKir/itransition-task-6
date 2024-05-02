@@ -12,13 +12,16 @@ import HomePage from "./pages/HomePage.jsx";
 import ErrorPage from "./pages/ErrorPage.jsx";
 import BoardList from "./components/BoardList.jsx";
 import Board from "./components/Board.jsx";
+import ProtectedRoutes from "./routes/protectedRoutes";
 
 const router = createBrowserRouter(
   createRoutesFromElements(
     <Route path="/" element={<App />}>
       <Route path="/" element={<HomePage />} />
-      <Route path="/boards" element={<BoardList />}></Route>
-      <Route path="/boards/:id" element={<Board />}></Route>
+      <Route element={<ProtectedRoutes />}>
+        <Route path="/boards" element={<BoardList />}></Route>
+        <Route path="/boards/:id" element={<Board />}></Route>
+      </Route>
       <Route path="*" element={<ErrorPage />} />
     </Route>
   )

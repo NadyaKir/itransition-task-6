@@ -14,6 +14,7 @@ const BoardList = () => {
   const [isLoading, setIsLoading] = useState(false);
   const [newBoardName, setNewBoardName] = useState("");
   const [searchQuery, setSearchQuery] = useState("");
+
   const user = useSelector((state) => state.users.userName);
 
   const handleAddBoard = (event) => {

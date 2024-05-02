@@ -10,7 +10,6 @@ export default function Home() {
   const dispatch = useDispatch();
 
   const userName = useSelector((state) => state.users.userName);
-  console.log(userName);
 
   const handleEnter = () => {
     if (userName.trim() !== "") {
