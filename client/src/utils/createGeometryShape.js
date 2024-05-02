@@ -21,6 +21,16 @@ export const createGeometryShape = ({ canvas, shapeType, color }) => {
       ...shapeOptions,
       radius: 50,
     });
+  } else if (shapeType === "line") {
+    shape = new fabric.Line([randomX, randomY, randomX + 200, randomY + 100], {
+      ...shapeOptions,
+    });
+  } else if (shapeType === "triangle") {
+    shape = new fabric.Triangle({
+      ...shapeOptions,
+      width: 100,
+      height: 100,
+    });
   }
 
   return { shape };

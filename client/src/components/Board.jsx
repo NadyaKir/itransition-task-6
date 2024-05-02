@@ -6,10 +6,11 @@ import { fabric } from "fabric";
 import { FabricJSCanvas, useFabricJSEditor } from "fabricjs-react";
 import { BsBrush } from "react-icons/bs";
 import { FaRegCircle } from "react-icons/fa";
-import { BiRectangle } from "react-icons/bi";
-import { BiUndo, BiRedo } from "react-icons/bi";
+import { BiRectangle, BiUndo, BiRedo } from "react-icons/bi";
 import { RiDeleteBinLine } from "react-icons/ri";
 import { AiOutlineUserSwitch } from "react-icons/ai";
+import { IoTriangleOutline } from "react-icons/io5";
+import { TfiLayoutLineSolid } from "react-icons/tfi";
 import ToolButton from "./ToolButton";
 import { InputNumber, Statistic, Col } from "antd";
 import { createGeometryShape } from "../utils/createGeometryShape";
@@ -90,6 +91,26 @@ export default function Board() {
     });
 
     editor.canvas.add(rectangle);
+  };
+
+  const onAddLine = () => {
+    const { shape: line } = createGeometryShape({
+      canvas: editor.canvas,
+      shapeType: "line",
+      color,
+    });
+
+    editor.canvas.add(line);
+  };
+
+  const onAddTriangle = () => {
+    const { shape: triangle } = createGeometryShape({
+      canvas: editor.canvas,
+      shapeType: "triangle",
+      color,
+    });
+
+    editor.canvas.add(triangle);
   };
 
   const toggleDrawingMode = () => {
@@ -265,6 +286,20 @@ export default function Board() {
           />
         )}
 
+        <ToolButton handleEvent={onAddTriangle}>
+          <IoTriangleOutline
+            className="text-black hover:text-orange-500 text-3xl"
+            title="Circle"
+          />
+        </ToolButton>
+        <ToolButton handleEvent={onAddLine}>
+          <div style={{ transform: "rotate(45deg)" }}>
+            <TfiLayoutLineSolid
+              className="text-black hover:text-orange-500 text-3xl"
+              title="Line"
+            />
+          </div>
+        </ToolButton>
         <ToolButton handleEvent={onAddCircle}>
           <FaRegCircle
             className="text-black hover:text-orange-500 text-3xl"
