@@ -290,12 +290,6 @@ export default function Board() {
           />
         )}
 
-        <ToolButton handleEvent={onAddTriangle}>
-          <IoTriangleOutline
-            className="text-black hover:text-orange-500 text-3xl"
-            title="Circle"
-          />
-        </ToolButton>
         <ToolButton handleEvent={onAddLine}>
           <div style={{ transform: "rotate(45deg)" }}>
             <TfiLayoutLineSolid
@@ -314,6 +308,12 @@ export default function Board() {
           <BiRectangle
             className="text-black hover:text-orange-500 text-3xl"
             title="Rectangle"
+          />
+        </ToolButton>
+        <ToolButton handleEvent={onAddTriangle}>
+          <IoTriangleOutline
+            className="text-black hover:text-orange-500 text-3xl"
+            title="Circle"
           />
         </ToolButton>
         <ToolButton handleEvent={removeSelectedObject}>

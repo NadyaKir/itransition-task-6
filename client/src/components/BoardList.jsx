@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from "react";
 import axios from "axios";
 import { Link } from "react-router-dom";
-import { Button, Input, Space } from "antd";
+import { Button, Input, Space, Pagination } from "antd";
 import { fetchBoards } from "../api/fetchBoards";
 import Logo from "../assets/logo.png";
 import EmptyCanvas from "../assets/empty_canvas.jpeg";
@@ -37,6 +37,17 @@ const BoardList = () => {
   const filteredBoards = boards.filter((board) =>
     board.name.toLowerCase().includes(searchQuery.toLowerCase())
   );
+
+  const [currentPage, setCurrentPage] = useState(1);
+  const itemsPerPage = 8;
+
+  const onPageChange = (page) => {
+    setCurrentPage(page);
+  };
+
+  const indexOfLastItem = currentPage * itemsPerPage;
+  const indexOfFirstItem = indexOfLastItem - itemsPerPage;
+  const currentItems = filteredBoards.slice(indexOfFirstItem, indexOfLastItem);
 
   return (
     <div className="container mx-auto min-h-screen flex flex-col flex-wrap px-1">
@@ -94,7 +105,7 @@ const BoardList = () => {
 
         {filteredBoards.length > 0 && (
           <div class="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 xl:grid-cols-5 gap-4 mb-5">
-            {filteredBoards.map((board, index) => (
+            {currentItems.map((board, index) => (
               <div
                 key={board._id}
                 className="h-40 border border-gray-100 shadow-sm rounded-lg overflow-hidden"
@@ -115,6 +126,13 @@ const BoardList = () => {
             ))}
           </div>
         )}
+        <Pagination
+          current={currentPage}
+          total={filteredBoards.length}
+          pageSize={itemsPerPage}
+          onChange={onPageChange}
+        />
+
         {!isLoading && filteredBoards.length === 0 && <EmptyData />}
       </div>
     </div>
