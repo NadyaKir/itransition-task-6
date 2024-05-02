@@ -126,14 +126,18 @@ export default function Board() {
 
   const undo = () => {
     if (editor.canvas._objects.length > 0) {
-      history.push(editor.canvas._objects.pop());
+      const removedObject = editor.canvas._objects.pop();
+      history.push(removedObject);
+      update();
     }
     editor.canvas.renderAll();
   };
 
   const redo = () => {
     if (history.length > 0) {
-      editor.canvas.add(history.pop());
+      const restoredObject = history.pop();
+      editor.canvas.add(restoredObject);
+      update();
     }
   };
 
@@ -228,10 +232,10 @@ export default function Board() {
         <div className="max-h-72 fixed top-5 right-0 m-6 p-4 bg-transparent bg-opacity-80 rounded-lg z-20 overflow-auto">
           <h3 className="text-xl font-semibold text-black mb-2">Users</h3>
           <ul className="divide-y divide-gray-700 overflow-auto">
-            {participants.map((p, index) => (
+            {participants.map((participant, index) => (
               <li key={index} className="py-1">
                 <span className="text-green-500">● </span>
-                <span className="text-black">{p}</span>
+                <span className="text-black">{participant}</span>
               </li>
             ))}
           </ul>
