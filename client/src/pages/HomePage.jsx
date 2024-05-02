@@ -6,8 +6,6 @@ import { setUserName } from "../store/userSlice";
 import { useDispatch, useSelector } from "react-redux";
 
 export default function Home() {
-  // const [userName, setUserName] = useState("");
-
   const navigate = useNavigate();
   const dispatch = useDispatch();
 
@@ -20,6 +18,10 @@ export default function Home() {
     }
   };
 
+  const handleUserName = (event) => {
+    dispatch(setUserName(event.target.value));
+  };
+
   return (
     <div className="h-screen">
       <div className="h-screen flex flex-col justify-center items-center">
@@ -29,7 +31,7 @@ export default function Home() {
             type="text"
             placeholder="Enter your name"
             value={userName}
-            onChange={(e) => dispatch(setUserName(e.target.value))}
+            onChange={handleUserName}
             style={{
               borderColor: "#FFA500",
             }}
