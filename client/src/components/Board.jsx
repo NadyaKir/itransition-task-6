@@ -10,20 +10,28 @@ import { BiRectangle } from "react-icons/bi";
 import { BiUndo, BiRedo } from "react-icons/bi";
 import { RiDeleteBinLine } from "react-icons/ri";
 import ToolButton from "./ToolButton";
-import { InputNumber } from "antd";
+import { InputNumber, Statistic, Col } from "antd";
 import { createGeometryShape } from "../utils/createGeometryShape";
 import { useSelector } from "react-redux";
+import exportCanvasToJPEG from "../utils/exoprtCanvasToJPEG";
 
 export default function Board() {
   const { editor, onReady } = useFabricJSEditor();
   const [color, setColor] = useState("#000");
   const [isDrawing, setIsDrawing] = useState(false);
   const [brushSize, setBrushSize] = useState();
+  const [userCount, setUserCount] = useState(0);
+
+  const [actions, setActions] = useState([]);
+  const [participants, setParticipants] = useState([]);
+
+  console.log(actions);
+  console.log(participants);
+
   const { id } = useParams();
   const socket = io("http://localhost:8000");
+  const userNameFromState = useSelector((state) => state.users.userName);
 
-  const userName = useSelector((state) => state.users.userName);
-  console.log("useSelector", userName);
   const updateEventList = [
     "object:modified",
     "object:added",
@@ -90,6 +98,10 @@ export default function Board() {
     setIsDrawing(!isDrawing);
   };
 
+  const onSizeChange = (value) => {
+    setBrushSize(value);
+  };
+
   const history = [];
 
   const undo = () => {
@@ -113,6 +125,10 @@ export default function Board() {
     editor.canvas.remove(editor.canvas.getActiveObject());
   };
 
+  const handleExportCanvas = () => {
+    exportCanvasToJPEG(editor.canvas);
+  };
+
   useEffect(() => {
     if (!editor || !editor.canvas) {
       return;
@@ -125,19 +141,30 @@ export default function Board() {
       socket.emit("client-ready", id);
     });
 
-    socket.emit("joinRoom", id, userName);
+    socket.on("participantsList", (participantsList) => {
+      setParticipants(participantsList);
+    });
+
+    socket.emit("joinRoom", id, userNameFromState);
 
     socket.on("userJoined", ({ userName }) => {
-      console.log(`${userName} присоединился к комнате`);
+      console.log(`${userName} присоединился к комнате UI`);
+      const joinMessage =
+        userName === userNameFromState
+          ? "You have joined the room. ACTIONS"
+          : `${userName} joined the room. ACTIONS`;
+      setActions((prevActions) => [...prevActions, joinMessage]);
     });
 
     socket.on("participantsCount", (count) => {
-      console.log(`Количество участников в комнате: ${count}`);
+      setUserCount(count);
+    });
+
+    window.addEventListener("beforeunload", () => {
+      socket.emit("leaveRoom", id, userNameFromState);
     });
 
     socket.on("canvas-state-from-server", (state) => {
-      console.log("I received the state");
-      console.log("state from db", state);
       removeUpdateEvents();
       editor.canvas.loadFromJSON(
         state,
@@ -152,36 +179,40 @@ export default function Board() {
       editor.canvas.renderAll();
     });
 
+    socket.on("userLeft", ({ userName }) => {
+      // console.log(userName, "useLeft socket on client");
+      const leaveMessage = `${userName} leaves the room.UI`;
+      setActions((prevActions) => [...prevActions, leaveMessage]);
+      socket.on("participantsList", (participantsList) => {
+        setParticipants(participantsList);
+      });
+      console.log(`${userName} покидает комнату`);
+    });
+
     return () => {
       removeUpdateEvents();
+      socket.disconnect();
       socket.off("canvas-state-from-server");
       socket.off("clear");
-      socket.disconnect();
+      socket.off("participantsList");
+      socket.off("participantsCount");
     };
   }, [editor, id]);
 
-  function exportCanvasToJPEG() {
-    if (!editor.canvas) return;
-    const originalBackgroundColor = editor.canvas.backgroundColor;
-    editor.canvas.backgroundColor = "white";
-
-    const timestamp = new Date().toISOString().replace(/:/g, "-");
-    const filename = `canvas_${timestamp}.jpg`;
-    const link = document.createElement("a");
-
-    link.download = filename;
-    link.href = editor.canvas.toDataURL({ format: "jpeg", quality: 0.8 });
-    editor.canvas.backgroundColor = originalBackgroundColor;
-
-    link.click();
-  }
-
-  const onSizeChange = (value) => {
-    setBrushSize(value);
-  };
-
   return (
     <div className="relative w-screen h-screen flex justify-center items-center">
+      <div className="absolute top-0 right-0 flex gap-10 bg-red-300">
+        <ul>
+          {actions.map((p) => (
+            <li>{p}</li>
+          ))}
+        </ul>
+        <ul>
+          {participants.map((p) => (
+            <li>{p}</li>
+          ))}
+        </ul>
+      </div>
       <div className="absolute top-0 left-0 flex flex-col justify-start items-center gap-3 mb-2 p-4 z-10">
         <button className="mb-5 text-2xl">
           <Link to="/boards">Back</Link>
@@ -196,7 +227,6 @@ export default function Board() {
             />
           </label>
         </ToolButton>
-
         <ToolButton handleEvent={clear}>
           <ClearOutlined
             className="text-black hover:text-orange-500 text-3xl"
@@ -256,15 +286,18 @@ export default function Board() {
             />
           </ToolButton>
         </div>
-        <ToolButton handleEvent={exportCanvasToJPEG}>
+        <ToolButton handleEvent={handleExportCanvas}>
           <DownloadOutlined
             className="text-black hover:text-orange-500 text-3xl"
             title="Export to JPEG"
           />
         </ToolButton>
       </div>
+      <Col className="absolute bottom-0 left-0 p-3" span={12}>
+        <Statistic title="Active Users" value={userCount} />
+      </Col>
       <FabricJSCanvas
-        className="sample-canvas border h-screen w-screen  border-black"
+        className="sample-canvas border h-screen w-screen border-black"
         onReady={onReady}
       />
     </div>

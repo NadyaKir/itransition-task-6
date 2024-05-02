@@ -16,17 +16,36 @@ const io = new Server(server, {
   },
 });
 
+const participants = {};
+
 io.on("connection", (socket) => {
   console.log("connection");
 
-  socket.on("joinRoom", (boardId, userName) => {
-    boardId = boardId;
-    console.log("hello", userName);
-    socket.join(boardId);
-    io.to(boardId).emit("userJoined", { userId: socket.id, userName });
-    const room = io.sockets.adapter.rooms.get(boardId);
+  socket.on("joinRoom", async (roomId, userName) => {
+    participants[socket.id] = userName;
+    socket.room = roomId;
+    socket.userName = userName;
+    socket.join(roomId);
+
+    io.to(roomId).emit("userJoined", { userName });
+    const room = io.sockets.adapter.rooms.get(roomId);
     const participantsCount = room ? room.size : 0;
-    io.to(boardId).emit("participantsCount", participantsCount);
+    io.to(roomId).emit("participantsCount", participantsCount);
+
+    const roomParticipants = getRoomParticipants(roomId);
+    io.to(roomId).emit("participantsList", roomParticipants);
+  });
+
+  socket.on("leaveRoom", async (roomId, userName) => {
+    const room = io.sockets.adapter.rooms.get(roomId);
+    if (room) {
+      socket.leave(room);
+      io.to(roomId).emit("userLeft", { userName });
+      const participantsCount = room ? room.size : 0;
+      io.to(roomId).emit("participantsCount", participantsCount);
+      const roomParticipants = getRoomParticipants(roomId);
+      io.to(roomId).emit("participantsList", roomParticipants);
+    }
   });
 
   socket.on("client-ready", async (boardId) => {
@@ -41,7 +60,6 @@ io.on("connection", (socket) => {
   });
 
   socket.on("canvas-state", async ({ boardId, canvasData, previewData }) => {
-    console.log("canvas-state", boardId, canvasData, previewData);
     if (!canvasData) return;
     try {
       const board = await Board.findById(boardId);
@@ -67,7 +85,25 @@ io.on("connection", (socket) => {
       console.error("Error clearing canvas data:", error);
     }
   });
+
+  socket.on("disconnect", () => {
+    const room = io.sockets.adapter.rooms.get(socket.room);
+    const participantsCount = room ? room.size : 0;
+    io.to(socket.room).emit("participantsCount", participantsCount);
+    const roomParticipants = getRoomParticipants(socket.room);
+    io.to(socket.room).emit("participantsList", roomParticipants);
+    delete participants[socket.id];
+  });
 });
+
+function getRoomParticipants(roomId) {
+  const room = io.sockets.adapter.rooms.get(roomId);
+  const participantIds = room ? Array.from(room) : [];
+
+  const roomParticipants = participantIds.map((id) => participants[id]);
+
+  return roomParticipants;
+}
 
 app.use(bodyParser.json());
 app.use(cors());
