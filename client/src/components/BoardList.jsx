@@ -144,7 +144,9 @@ const BoardList = () => {
           </div>
         )}
 
-        {!isLoading && filteredBoards.length === 0 && <EmptyData />}
+        {!isLoading && (filteredBoards.length === 0 || boards.length === 0) && (
+          <EmptyData />
+        )}
       </div>
     </div>
   );
