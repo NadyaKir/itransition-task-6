@@ -8,17 +8,17 @@ import {
 import { TbCalendarDown, TbCalendarUp } from "react-icons/tb";
 import { fetchBoards, addNewBoard } from "../api/fetchBoards";
 import Logo from "../assets/logo.png";
-import Loader from "./Loader";
-import EmptyData from "./EmptyData";
+import Loader from "../components/Loader";
+import EmptyData from "../components/EmptyData";
 import { useSelector } from "react-redux";
-import BoardItem from "./BoardItem";
+import BoardItem from "../components/BoardList/BoardItem";
 import {
   sortBoardsByName,
   sortBoardsByDate,
   filterBoardsByName,
 } from "../utils/sortAndFiltrForBoards";
 
-const BoardList = () => {
+const BoardListPage = () => {
   const [boards, setBoards] = useState([]);
   const [isLoading, setIsLoading] = useState(false);
   const [newBoardName, setNewBoardName] = useState("");
@@ -178,4 +178,4 @@ const BoardList = () => {
   );
 };
 
-export default BoardList;
+export default BoardListPage;

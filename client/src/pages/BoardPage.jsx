@@ -1,23 +1,24 @@
 import { useEffect, useState } from "react";
 import { io } from "socket.io-client";
 import { useParams } from "react-router-dom";
-import { ClearOutlined, DownloadOutlined } from "@ant-design/icons";
 import { fabric } from "fabric";
 import { FabricJSCanvas, useFabricJSEditor } from "fabricjs-react";
-import { BsBrush } from "react-icons/bs";
-import { FaRegCircle } from "react-icons/fa";
-import { BiRectangle, BiUndo, BiRedo } from "react-icons/bi";
-import { RiDeleteBinLine } from "react-icons/ri";
 import { AiOutlineUserSwitch } from "react-icons/ai";
-import { IoTriangleOutline } from "react-icons/io5";
-import { TfiLayoutLineSolid } from "react-icons/tfi";
-import ToolButton from "./ToolButton";
-import { InputNumber, Statistic, Col } from "antd";
 import { createGeometryShape } from "../utils/createGeometryShape";
 import { useSelector } from "react-redux";
 import exportCanvasToJPEG from "../utils/exoprtCanvasToJPEG";
+import RoomInfo from "../components/Board/RoomInfo";
+import UserAmount from "../components/Board/UserAmount";
+import ToolPanel from "../components/Board/ToolPanel";
 
-export default function Board() {
+const updateEventList = [
+  "object:modified",
+  "object:added",
+  "object:removed",
+  "object:moved",
+];
+
+const BoardPage = () => {
   const { editor, onReady } = useFabricJSEditor();
   const [color, setColor] = useState("#000");
   const [isDrawing, setIsDrawing] = useState(false);
@@ -31,13 +32,6 @@ export default function Board() {
   const { id } = useParams();
   const socket = io("http://localhost:8000");
   const userNameFromState = useSelector((state) => state.users.userName);
-
-  const updateEventList = [
-    "object:modified",
-    "object:added",
-    "object:removed",
-    "object:moved",
-  ];
 
   const update = () => {
     console.log("canvas updated");
@@ -241,126 +235,31 @@ export default function Board() {
         title="Room information"
         onClick={() => setIsRoomInfo(!isRoomInfo)}
       />
-      {isRoomInfo && (
-        <div className="max-h-72 fixed top-7 right-0 m-6 p-4 bg-white bg-opacity-80 rounded-lg z-20 overflow-auto">
-          <h3 className="text-xl font-semibold text-black mb-2">Users</h3>
-          <ul className="divide-y divide-gray-700 overflow-auto">
-            {participants.map((participant, index) => (
-              <li key={index} className="py-1">
-                <span className="text-green-500">● </span>
-                <span className="text-black">{participant}</span>
-              </li>
-            ))}
-          </ul>
-          <h3 className="text-xl font-semibold text-black mt-4 mb-2 overflow-auto">
-            Info
-          </h3>
-          <ul className="divide-y divide-gray-700">
-            {actions.map((action, index) => (
-              <li key={index} className="py-1">
-                <span className="text-black">{action}</span>
-              </li>
-            ))}
-          </ul>
-        </div>
-      )}
+      {isRoomInfo && <RoomInfo participants={participants} actions={actions} />}
 
-      <div className="absolute top-0 left-0 flex flex-col justify-start items-center gap-3 mb-2 p-4 z-10">
-        <ToolButton title="Select color">
-          <label className="inline-block">
-            <input
-              type="color"
-              value={color}
-              onChange={(e) => setColor(e.target.value)}
-              className=" h-9 w-9"
-            />
-          </label>
-        </ToolButton>
-        <ToolButton handleEvent={clear}>
-          <ClearOutlined
-            className="text-black hover:text-orange-500 text-3xl"
-            title="Clear all"
-          />
-        </ToolButton>
-        <ToolButton handleEvent={toggleDrawingMode}>
-          <BsBrush
-            className={`${
-              isDrawing ? "text-orange-500" : "text-black"
-            } text-3xl hover:text-orange-500`}
-            title="Brush"
-          />
-        </ToolButton>
-        {isDrawing && (
-          <InputNumber
-            size="small"
-            min={1}
-            max={10}
-            defaultValue={3}
-            onChange={onSizeChange}
-            changeOnWheel
-            className="hover:border-orange-500 w-12 border-transparent text-center focus:border-orange-500 transition-all duration-300"
-          />
-        )}
-        <ToolButton handleEvent={onAddLine}>
-          <div style={{ transform: "rotate(45deg)" }}>
-            <TfiLayoutLineSolid
-              className="text-black hover:text-orange-500 text-3xl"
-              title="Line"
-            />
-          </div>
-        </ToolButton>
-        <ToolButton handleEvent={onAddCircle}>
-          <FaRegCircle
-            className="text-black hover:text-orange-500 text-3xl"
-            title="Circle"
-          />
-        </ToolButton>
-        <ToolButton handleEvent={onAddRectangle}>
-          <BiRectangle
-            className="text-black hover:text-orange-500 text-3xl"
-            title="Rectangle"
-          />
-        </ToolButton>
-        <ToolButton handleEvent={onAddTriangle}>
-          <IoTriangleOutline
-            className="text-black hover:text-orange-500 text-3xl"
-            title="Circle"
-          />
-        </ToolButton>
-        <ToolButton handleEvent={removeSelectedObject}>
-          <RiDeleteBinLine
-            className="text-black hover:text-orange-500 text-3xl"
-            title="Remove item"
-          />
-        </ToolButton>
-        <div className="flex gap-1">
-          <ToolButton handleEvent={undo}>
-            <BiUndo
-              className="text-black hover:text-orange-500 text-3xl"
-              title="Undo"
-            />
-          </ToolButton>
-          <ToolButton handleEvent={redo}>
-            <BiRedo
-              className="text-black hover:text-orange-500 text-3xl"
-              title="Redo"
-            />
-          </ToolButton>
-        </div>
-        <ToolButton handleEvent={handleExportCanvas}>
-          <DownloadOutlined
-            className="text-black hover:text-orange-500 text-3xl"
-            title="Export to JPEG"
-          />
-        </ToolButton>
-      </div>
-      <Col className="absolute bottom-0 left-0 p-3" span={12}>
-        <Statistic title="Active Users" value={userCount} />
-      </Col>
+      <ToolPanel
+        color={color}
+        setColor={setColor}
+        clear={clear}
+        toggleDrawingMode={toggleDrawingMode}
+        isDrawing={isDrawing}
+        onSizeChange={onSizeChange}
+        onAddLine={onAddLine}
+        onAddCircle={onAddCircle}
+        onAddRectangle={onAddRectangle}
+        onAddTriangle={onAddTriangle}
+        removeSelectedObject={removeSelectedObject}
+        undo={undo}
+        redo={redo}
+        handleExportCanvas={handleExportCanvas}
+      />
+      <UserAmount userCount={userCount} />
       <FabricJSCanvas
         className="sample-canvas border h-screen w-screen "
         onReady={onReady}
       />
     </div>
   );
-}
+};
+
+export default BoardPage;

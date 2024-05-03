@@ -10,8 +10,8 @@ import App from "./App.jsx";
 import "./index.css";
 import HomePage from "./pages/HomePage.jsx";
 import ErrorPage from "./pages/ErrorPage.jsx";
-import BoardList from "./components/BoardList.jsx";
-import Board from "./components/Board.jsx";
+import BoardListPage from "./pages/BoardListPage.jsx";
+import BoardPage from "./pages/BoardPage.jsx";
 import ProtectedRoutes from "./routes/protectedRoutes";
 
 const router = createBrowserRouter(
@@ -19,8 +19,8 @@ const router = createBrowserRouter(
     <Route path="/" element={<App />}>
       <Route path="/" element={<HomePage />} />
       <Route element={<ProtectedRoutes />}>
-        <Route path="/boards" element={<BoardList />}></Route>
-        <Route path="/boards/:id" element={<Board />}></Route>
+        <Route path="/boards" element={<BoardListPage />}></Route>
+        <Route path="/boards/:id" element={<BoardPage />}></Route>
       </Route>
       <Route path="*" element={<ErrorPage />} />
     </Route>

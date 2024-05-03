@@ -1,7 +1,6 @@
-// BoardItem.jsx
 import React from "react";
 import { Link } from "react-router-dom";
-import EmptyCanvas from "../assets/empty_canvas.jpeg";
+import EmptyCanvas from "../../assets/empty_canvas.jpeg";
 
 const BoardItem = ({ board, index }) => {
   return (
