@@ -13,3 +13,20 @@ export const fetchBoards = (setData, setIsLoading) => {
       console.error("Ошибка при загрузке списка досок:", error);
     });
 };
+
+export const addNewBoard = (
+  boards,
+  setBoards,
+  setNewBoardName,
+  newBoardName
+) => {
+  axios
+    .post("http://localhost:8000/api/boards", { name: newBoardName })
+    .then((response) => {
+      setBoards([...boards, response.data]);
+      setNewBoardName("");
+    })
+    .catch((error) => {
+      console.error("Error set new board:", error);
+    });
+};

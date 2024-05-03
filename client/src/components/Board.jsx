@@ -172,10 +172,7 @@ export default function Board() {
     socket.emit("joinRoom", id, userNameFromState);
 
     socket.on("userJoined", ({ userName }) => {
-      const joinMessage =
-        userName === userNameFromState
-          ? "You have joined the room."
-          : `${userName} joined the room.`;
+      const joinMessage = `${userName} joined the room.`;
       setActions((prevActions) => [...prevActions, joinMessage]);
     });
 
@@ -183,9 +180,19 @@ export default function Board() {
       setUserCount(count);
     });
 
-    window.addEventListener("beforeunload", () => {
+    const handleBeforeUnload = () => {
       socket.emit("leaveRoom", id, userNameFromState);
-    });
+      removeUpdateEvents();
+      socket.disconnect();
+    };
+    window.addEventListener("beforeunload", handleBeforeUnload);
+
+    const handlePopstate = () => {
+      socket.emit("leaveRoom", id, userNameFromState);
+      socket.disconnect();
+    };
+
+    window.addEventListener("popstate", handlePopstate);
 
     socket.on("canvas-state-from-server", (state) => {
       removeUpdateEvents();
@@ -213,13 +220,19 @@ export default function Board() {
 
     return () => {
       removeUpdateEvents();
-      socket.disconnect();
+      window.removeEventListener("beforeunload", handleBeforeUnload);
       socket.off("canvas-state-from-server");
       socket.off("clear");
+      socket.off("client-ready");
+      socket.off("joinRoom");
+      socket.off("userJoined");
+      socket.off("leaveRoom");
+      socket.off("userLeft");
       socket.off("participantsList");
       socket.off("participantsCount");
+      socket.disconnect();
     };
-  }, [editor, id]);
+  }, [editor, id, userNameFromState]);
 
   return (
     <div className="relative w-screen h-screen flex justify-center items-center">
@@ -229,7 +242,7 @@ export default function Board() {
         onClick={() => setIsRoomInfo(!isRoomInfo)}
       />
       {isRoomInfo && (
-        <div className="max-h-72 fixed top-5 right-0 m-6 p-4 bg-transparent bg-opacity-80 rounded-lg z-20 overflow-auto">
+        <div className="max-h-72 fixed top-7 right-0 m-6 p-4 bg-white bg-opacity-80 rounded-lg z-20 overflow-auto">
           <h3 className="text-xl font-semibold text-black mb-2">Users</h3>
           <ul className="divide-y divide-gray-700 overflow-auto">
             {participants.map((participant, index) => (

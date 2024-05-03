@@ -24,7 +24,7 @@ io.on("connection", (socket) => {
   socket.on("joinRoom", async (roomId, userName) => {
     participants[socket.id] = userName;
     socket.room = roomId;
-    socket.userName = userName;
+    // socket.userName = userName;
     socket.join(roomId);
 
     io.to(roomId).emit("userJoined", { userName });
