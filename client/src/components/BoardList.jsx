@@ -50,7 +50,7 @@ const BoardList = () => {
   const currentItems = filteredBoards.slice(indexOfFirstItem, indexOfLastItem);
 
   return (
-    <div className="container mx-auto min-h-screen flex flex-col flex-wrap px-1">
+    <div className="container mx-auto min-h-screen flex flex-col flex-wrap px-3 sm:px-0">
       <div className="flex justify-between items-center mt-2">
         <Link to={`/`}>
           <img src={Logo} alt="Logo" className="w-40 h-16" />
@@ -104,9 +104,9 @@ const BoardList = () => {
         {!isLoading && boards.length === 0 && <EmptyData />}
 
         {filteredBoards.length > 0 && (
-          <div className="h-screen flex flex-col flex-[1_0_82%] justify-between">
-            <div className="h-screen flex flex-col flex-[1_0_82%]">
-              <div class="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 xl:grid-cols-3 gap-4 mb-5">
+          <div className=" flex flex-col flex-1 justify-between">
+            <div className="flex flex-col flex-1 h-full ">
+              <div class="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 xl:grid-cols-3 gap-4">
                 {currentItems.map((board, index) => (
                   <div
                     key={board._id}
@@ -132,7 +132,7 @@ const BoardList = () => {
             </div>
 
             {!isLoading && (
-              <div className="flex grow m-auto">
+              <div className="flex m-auto my-5">
                 <Pagination
                   current={currentPage}
                   total={filteredBoards.length}

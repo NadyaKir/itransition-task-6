@@ -1,6 +1,6 @@
 import { useEffect, useState } from "react";
 import { io } from "socket.io-client";
-import { Link, useParams } from "react-router-dom";
+import { useParams } from "react-router-dom";
 import { ClearOutlined, DownloadOutlined } from "@ant-design/icons";
 import { fabric } from "fabric";
 import { FabricJSCanvas, useFabricJSEditor } from "fabricjs-react";
@@ -259,7 +259,7 @@ export default function Board() {
               type="color"
               value={color}
               onChange={(e) => setColor(e.target.value)}
-              className=" h-11"
+              className=" h-9 w-9"
             />
           </label>
         </ToolButton>
@@ -269,7 +269,6 @@ export default function Board() {
             title="Clear all"
           />
         </ToolButton>
-
         <ToolButton handleEvent={toggleDrawingMode}>
           <BsBrush
             className={`${
@@ -289,7 +288,6 @@ export default function Board() {
             className="hover:border-orange-500 w-12 border-transparent text-center focus:border-orange-500 transition-all duration-300"
           />
         )}
-
         <ToolButton handleEvent={onAddLine}>
           <div style={{ transform: "rotate(45deg)" }}>
             <TfiLayoutLineSolid
