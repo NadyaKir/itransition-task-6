@@ -39,7 +39,7 @@ const BoardList = () => {
   );
 
   const [currentPage, setCurrentPage] = useState(1);
-  const itemsPerPage = 8;
+  const itemsPerPage = 6;
 
   const onPageChange = (page) => {
     setCurrentPage(page);
@@ -60,7 +60,7 @@ const BoardList = () => {
         </p>
       </div>
 
-      <div className="flex flex-col h-full flex-1">
+      <div className="flex flex-col h-screen flex-1">
         <div className="flex justify-between items-center flex-wrap">
           <div className="flex mt-5 mb-5">
             <form onSubmit={handleAddBoard}>
@@ -104,34 +104,45 @@ const BoardList = () => {
         {!isLoading && boards.length === 0 && <EmptyData />}
 
         {filteredBoards.length > 0 && (
-          <div class="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 xl:grid-cols-5 gap-4 mb-5">
-            {currentItems.map((board, index) => (
-              <div
-                key={board._id}
-                className="h-40 border border-gray-100 shadow-sm rounded-lg overflow-hidden"
-              >
-                <Link to={`/boards/${board._id}`}>
-                  <div className="relative h-full hover:scale-105 hover:shadow-md transition-transform duration-300">
-                    <img
-                      className="w-full"
-                      src={board.previewData ? board.previewData : EmptyCanvas}
-                      alt={`Board Preview ${index}`}
-                    />
-                    <div className="absolute bottom-0 left-0 right-0 bg-[#FFA500] bg-opacity-60 text-white text-center py-2">
-                      <span className="block font-bold">{board.name}</span>
-                    </div>
+          <div className="h-screen flex flex-col flex-[1_0_82%] justify-between">
+            <div className="h-screen flex flex-col flex-[1_0_82%]">
+              <div class="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 xl:grid-cols-3 gap-4 mb-5">
+                {currentItems.map((board, index) => (
+                  <div
+                    key={board._id}
+                    className="h-72 border border-gray-100 shadow-sm rounded-lg overflow-hidden"
+                  >
+                    <Link to={`/boards/${board._id}`}>
+                      <div className="relative h-full hover:scale-105 hover:shadow-md transition-transform duration-300">
+                        <img
+                          className="w-full"
+                          src={
+                            board.previewData ? board.previewData : EmptyCanvas
+                          }
+                          alt={`Board Preview ${index}`}
+                        />
+                        <div className="absolute bottom-0 left-0 right-0 bg-[#FFA500] bg-opacity-60 text-white text-center py-2">
+                          <span className="block font-bold">{board.name}</span>
+                        </div>
+                      </div>
+                    </Link>
                   </div>
-                </Link>
+                ))}
               </div>
-            ))}
+            </div>
+
+            {!isLoading && (
+              <div className="flex grow m-auto">
+                <Pagination
+                  current={currentPage}
+                  total={filteredBoards.length}
+                  pageSize={itemsPerPage}
+                  onChange={onPageChange}
+                />
+              </div>
+            )}
           </div>
         )}
-        <Pagination
-          current={currentPage}
-          total={filteredBoards.length}
-          pageSize={itemsPerPage}
-          onChange={onPageChange}
-        />
 
         {!isLoading && filteredBoards.length === 0 && <EmptyData />}
       </div>
