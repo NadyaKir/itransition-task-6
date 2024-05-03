@@ -160,7 +160,9 @@ const BoardList = () => {
 
         {isLoading && <Loader />}
 
-        {!isLoading && boards.length === 0 && <EmptyData />}
+        {!isLoading && currentItems.length === 0 && boards.length > 0 && (
+          <EmptyData />
+        )}
 
         {currentItems.length > 0 && (
           <div className=" flex flex-col flex-1 justify-between">
@@ -203,7 +205,9 @@ const BoardList = () => {
           </div>
         )}
 
-        {!isLoading && currentItems.length === 0 && <EmptyData />}
+        {!isLoading && currentItems.length === 0 && boards.length === 0 && (
+          <EmptyData />
+        )}
       </div>
     </div>
   );
