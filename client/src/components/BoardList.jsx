@@ -38,6 +38,15 @@ const BoardList = () => {
     board.name.toLowerCase().includes(searchQuery.toLowerCase())
   );
 
+  const handleSearch = (value) => {
+    setSearchQuery(value);
+    setCurrentPage(1);
+  };
+
+  const handleBlur = () => {
+    setSearchQuery("");
+  };
+
   const [currentPage, setCurrentPage] = useState(1);
   const itemsPerPage = 6;
 
@@ -92,7 +101,8 @@ const BoardList = () => {
               <Input
                 type="text"
                 value={searchQuery}
-                onChange={(event) => setSearchQuery(event.target.value)}
+                onChange={(event) => handleSearch(event.target.value)}
+                onBlur={handleBlur}
                 placeholder="Search boards"
               />
             </Space.Compact>

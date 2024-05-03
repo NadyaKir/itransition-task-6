@@ -345,7 +345,7 @@ export default function Board() {
         <Statistic title="Active Users" value={userCount} />
       </Col>
       <FabricJSCanvas
-        className="sample-canvas border h-screen w-screen border-black"
+        className="sample-canvas border h-screen w-screen "
         onReady={onReady}
       />
     </div>
