@@ -2,6 +2,10 @@ import React, { useState, useEffect } from "react";
 import axios from "axios";
 import { Link } from "react-router-dom";
 import { Button, Input, Space, Pagination } from "antd";
+import {
+  AiOutlineSortAscending,
+  AiOutlineSortDescending,
+} from "react-icons/ai";
 import { fetchBoards } from "../api/fetchBoards";
 import Logo from "../assets/logo.png";
 import EmptyCanvas from "../assets/empty_canvas.jpeg";
@@ -17,6 +21,14 @@ const BoardList = () => {
 
   const user = useSelector((state) => state.users.userName);
 
+  useEffect(() => {
+    fetchBoards(setBoards, setIsLoading);
+  }, [setBoards, setIsLoading, setSearchQuery]);
+
+  const filteredBoards = boards.filter((board) =>
+    board.name.toLowerCase().includes(searchQuery.toLowerCase())
+  );
+
   const handleAddBoard = (event) => {
     event.preventDefault();
     axios
@@ -29,14 +41,6 @@ const BoardList = () => {
         console.error("Error set new board:", error);
       });
   };
-
-  useEffect(() => {
-    fetchBoards(setBoards, setIsLoading);
-  }, [setBoards, setIsLoading, setSearchQuery]);
-
-  const filteredBoards = boards.filter((board) =>
-    board.name.toLowerCase().includes(searchQuery.toLowerCase())
-  );
 
   const handleSearch = (value) => {
     setSearchQuery(value);
@@ -57,6 +61,20 @@ const BoardList = () => {
   const indexOfLastItem = currentPage * itemsPerPage;
   const indexOfFirstItem = indexOfLastItem - itemsPerPage;
   const currentItems = filteredBoards.slice(indexOfFirstItem, indexOfLastItem);
+
+  const sortBoardsAZ = () => {
+    const sortedBoardsAZ = [...filteredBoards].sort((a, b) =>
+      a.name.localeCompare(b.name)
+    );
+    setBoards(sortedBoardsAZ);
+  };
+
+  const sortBoardsZA = () => {
+    const sortedBoardsZA = [...filteredBoards].sort((a, b) =>
+      b.name.localeCompare(a.name)
+    );
+    setBoards(sortedBoardsZA);
+  };
 
   return (
     <div className="container mx-auto min-h-screen flex flex-col flex-wrap px-3 sm:px-0">
@@ -98,6 +116,12 @@ const BoardList = () => {
 
           <div className="flex mt-5 mb-5 items-center">
             <Space.Compact>
+              <Button onClick={sortBoardsAZ}>
+                <AiOutlineSortAscending />
+              </Button>
+              <Button onClick={sortBoardsZA}>
+                <AiOutlineSortDescending />
+              </Button>
               <Input
                 type="text"
                 value={searchQuery}
