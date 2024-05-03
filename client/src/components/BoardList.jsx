@@ -25,7 +25,7 @@ const BoardList = () => {
 
   useEffect(() => {
     fetchBoards(setBoards, setIsLoading);
-  }, [setBoards, setIsLoading]);
+  }, [setBoards, setIsLoading, setSearchQuery, setCurrentPage]);
 
   const handleAddBoard = (event) => {
     event.preventDefault();
@@ -53,15 +53,18 @@ const BoardList = () => {
   const indexOfLastItem = currentPage * itemsPerPage;
   const indexOfFirstItem = indexOfLastItem - itemsPerPage;
 
-  const currentItems = boards
-    .filter((board) =>
-      board.name.toLowerCase().includes(searchQuery.toLowerCase())
-    )
-    .slice(indexOfFirstItem, indexOfLastItem);
+  const sortedAndFilteredBoards = boards.filter((board) =>
+    board.name.toLowerCase().includes(searchQuery.toLowerCase())
+  );
 
-  const totalItems = boards.length;
+  const currentItems = sortedAndFilteredBoards.slice(
+    indexOfFirstItem,
+    indexOfLastItem
+  );
 
+  const totalItems = sortedAndFilteredBoards.length;
   console.log(currentItems);
+
   const sortBoardsAZ = () => {
     const sortedBoardsAZ = [...boards].sort((a, b) =>
       a.name.localeCompare(b.name)
@@ -99,7 +102,7 @@ const BoardList = () => {
           <img src={Logo} alt="Logo" className="w-40 h-16" />
         </Link>
         <p>
-          Hello,
+          Hello,{" "}
           <span className="text-blue-800 font-semibold text-xl">{user}</span>
         </p>
       </div>
@@ -133,16 +136,16 @@ const BoardList = () => {
 
           <div className="flex mt-5 mb-5 items-center">
             <Space.Compact>
-              <Button onClick={sortBoardDateASC}>
+              <Button onClick={sortBoardDateASC} title="Earliest">
                 <TbCalendarDown />
               </Button>
-              <Button onClick={sortBoardDateDESC}>
+              <Button onClick={sortBoardDateDESC} title="Latest">
                 <TbCalendarUp />
               </Button>
-              <Button onClick={sortBoardsAZ}>
+              <Button onClick={sortBoardsAZ} title="A-Z">
                 <AiOutlineSortAscending />
               </Button>
-              <Button onClick={sortBoardsZA}>
+              <Button onClick={sortBoardsZA} title="Z_A">
                 <AiOutlineSortDescending />
               </Button>
               <Input
