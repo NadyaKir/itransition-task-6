@@ -1,5 +1,4 @@
 import mongoose from "mongoose";
-import { type } from "os";
 
 const boardSchema = new mongoose.Schema({
   name: { type: String, required: true },
@@ -8,6 +7,7 @@ const boardSchema = new mongoose.Schema({
     default: {},
   },
   previewData: { type: String, default: "" },
+  createdAt: { type: Date, default: Date.now },
 });
 
 const Board = mongoose.model("Board", boardSchema);

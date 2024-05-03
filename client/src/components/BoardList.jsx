@@ -6,6 +6,7 @@ import {
   AiOutlineSortAscending,
   AiOutlineSortDescending,
 } from "react-icons/ai";
+import { TbCalendarDown, TbCalendarUp } from "react-icons/tb";
 import { fetchBoards } from "../api/fetchBoards";
 import Logo from "../assets/logo.png";
 import EmptyCanvas from "../assets/empty_canvas.jpeg";
@@ -18,16 +19,13 @@ const BoardList = () => {
   const [isLoading, setIsLoading] = useState(false);
   const [newBoardName, setNewBoardName] = useState("");
   const [searchQuery, setSearchQuery] = useState("");
+  const [currentPage, setCurrentPage] = useState(1);
 
   const user = useSelector((state) => state.users.userName);
 
   useEffect(() => {
     fetchBoards(setBoards, setIsLoading);
-  }, [setBoards, setIsLoading, setSearchQuery]);
-
-  const filteredBoards = boards.filter((board) =>
-    board.name.toLowerCase().includes(searchQuery.toLowerCase())
-  );
+  }, [setBoards, setIsLoading]);
 
   const handleAddBoard = (event) => {
     event.preventDefault();
@@ -47,33 +45,51 @@ const BoardList = () => {
     setCurrentPage(1);
   };
 
-  const handleBlur = () => {
-    setSearchQuery("");
-  };
-
-  const [currentPage, setCurrentPage] = useState(1);
-  const itemsPerPage = 6;
-
   const onPageChange = (page) => {
     setCurrentPage(page);
   };
 
+  const itemsPerPage = 6;
   const indexOfLastItem = currentPage * itemsPerPage;
   const indexOfFirstItem = indexOfLastItem - itemsPerPage;
-  const currentItems = filteredBoards.slice(indexOfFirstItem, indexOfLastItem);
 
+  const currentItems = boards
+    .filter((board) =>
+      board.name.toLowerCase().includes(searchQuery.toLowerCase())
+    )
+    .slice(indexOfFirstItem, indexOfLastItem);
+
+  const totalItems = boards.length;
+
+  console.log(currentItems);
   const sortBoardsAZ = () => {
-    const sortedBoardsAZ = [...filteredBoards].sort((a, b) =>
+    const sortedBoardsAZ = [...boards].sort((a, b) =>
       a.name.localeCompare(b.name)
     );
     setBoards(sortedBoardsAZ);
   };
 
   const sortBoardsZA = () => {
-    const sortedBoardsZA = [...filteredBoards].sort((a, b) =>
+    const sortedBoardsZA = [...boards].sort((a, b) =>
       b.name.localeCompare(a.name)
     );
     setBoards(sortedBoardsZA);
+  };
+
+  const sortBoardDateASC = () => {
+    const sortedBoardsDateFirst = [...boards].sort(
+      (a, b) =>
+        new Date(a.createdAt).getTime() - new Date(b.createdAt).getTime()
+    );
+    setBoards(sortedBoardsDateFirst);
+  };
+
+  const sortBoardDateDESC = () => {
+    const sortedBoardsDateLast = [...boards].sort(
+      (a, b) =>
+        new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime()
+    );
+    setBoards(sortedBoardsDateLast);
   };
 
   return (
@@ -83,7 +99,8 @@ const BoardList = () => {
           <img src={Logo} alt="Logo" className="w-40 h-16" />
         </Link>
         <p>
-          Hello, <span className="text-blue-800 font-semibold">{user}</span>
+          Hello,
+          <span className="text-blue-800 font-semibold text-xl">{user}</span>
         </p>
       </div>
 
@@ -116,6 +133,12 @@ const BoardList = () => {
 
           <div className="flex mt-5 mb-5 items-center">
             <Space.Compact>
+              <Button onClick={sortBoardDateASC}>
+                <TbCalendarDown />
+              </Button>
+              <Button onClick={sortBoardDateDESC}>
+                <TbCalendarUp />
+              </Button>
               <Button onClick={sortBoardsAZ}>
                 <AiOutlineSortAscending />
               </Button>
@@ -126,7 +149,6 @@ const BoardList = () => {
                 type="text"
                 value={searchQuery}
                 onChange={(event) => handleSearch(event.target.value)}
-                onBlur={handleBlur}
                 placeholder="Search boards"
               />
             </Space.Compact>
@@ -137,7 +159,7 @@ const BoardList = () => {
 
         {!isLoading && boards.length === 0 && <EmptyData />}
 
-        {filteredBoards.length > 0 && (
+        {currentItems.length > 0 && (
           <div className=" flex flex-col flex-1 justify-between">
             <div className="flex flex-col flex-1 h-full ">
               <div class="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 xl:grid-cols-3 gap-4">
@@ -169,7 +191,7 @@ const BoardList = () => {
               <div className="flex m-auto my-5">
                 <Pagination
                   current={currentPage}
-                  total={filteredBoards.length}
+                  total={totalItems}
                   pageSize={itemsPerPage}
                   onChange={onPageChange}
                 />
@@ -178,9 +200,7 @@ const BoardList = () => {
           </div>
         )}
 
-        {!isLoading && (filteredBoards.length === 0 || boards.length === 0) && (
-          <EmptyData />
-        )}
+        {!isLoading && currentItems.length === 0 && <EmptyData />}
       </div>
     </div>
   );
