@@ -3,7 +3,7 @@ import axios from "axios";
 export const fetchBoards = (setData, setIsLoading) => {
   setIsLoading(true);
   axios
-    .get("http://localhost:8000/api/boards")
+    .get("https://itransition-task-6-y0ii.onrender.com/api/boards")
     .then((response) => {
       setData(response.data);
       setIsLoading(false);
@@ -20,7 +20,9 @@ export const addNewBoard = (
   newBoardName
 ) => {
   axios
-    .post("http://localhost:8000/api/boards", { name: newBoardName })
+    .post("https://itransition-task-6-y0ii.onrender.com/api/boards", {
+      name: newBoardName,
+    })
     .then((response) => {
       setBoards([...boards, response.data]);
       setNewBoardName("");
