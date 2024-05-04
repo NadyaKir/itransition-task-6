@@ -33,7 +33,7 @@ const BoardListPage = () => {
 
   const handleAddBoard = (event) => {
     event.preventDefault();
-    addNewBoard(setBoards, setNewBoardName, newBoardName);
+    addNewBoard(boards, setBoards, setNewBoardName, newBoardName);
   };
 
   const handleSearch = (value) => {
